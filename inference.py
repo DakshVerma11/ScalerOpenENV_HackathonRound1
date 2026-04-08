@@ -102,30 +102,6 @@ def env_state(base_url: str) -> Dict[str, Any]:
     return resp.json()
 
 
-def env_grade(
-    base_url: str,
-    actions_taken: List[str],
-    final_done: bool,
-    final_success: bool,
-    total_reward: float,
-    steps_taken: int,
-    identity_verified: bool,
-    refund_calculated: bool,
-) -> Dict[str, Any]:
-    payload = {
-        "actions_taken": actions_taken,
-        "final_obs_done": final_done,
-        "final_obs_success": final_success,
-        "total_reward": total_reward,
-        "steps_taken": steps_taken,
-        "identity_verified": identity_verified,
-        "refund_calculated": refund_calculated,
-    }
-    resp = requests.post(f"{base_url}/grade", json=payload, timeout=30)
-    resp.raise_for_status()
-    return resp.json()
-
-
 # ---------------------------------------------------------------------------
 # LLM Agent
 # ---------------------------------------------------------------------------
@@ -294,18 +270,26 @@ def run_inference(
 
     # ---- GRADE ----
     try:
-        grade_result = env_grade(
-            env_url,
+        from grader import Grader
+        from data_generator import generate_task
+        
+        # We know what the task was based on initial state
+        task_difficulty = initial_state.get("difficulty", "easy")
+        
+        # Recreate the task to get expected_resolution (with the exact same random state might be tricky via HTTP, but we can grade without it or manually mock it)
+        # Ideally, we should grade locally with a mocked task dictionary:
+        dummy_task = {"difficulty": task_difficulty, "expected_resolution": "all_resolved" if success else "unknown"}
+        grader = Grader(dummy_task)
+        score = grader.grade(
             actions_taken=actions_taken,
-            final_done=done,
-            final_success=success,
+            final_obs_done=done,
+            final_obs_success=success,
             total_reward=total_reward,
             steps_taken=step_count,
             identity_verified=identity_verified,
             refund_calculated=refund_calculated,
         )
-        score = grade_result.get("score", 0.0)
-        label = grade_result.get("label", "Unknown")
+        label = Grader.describe(score)
     except Exception as e:
         score = 0.0
         label = f"Grading error: {e}"
