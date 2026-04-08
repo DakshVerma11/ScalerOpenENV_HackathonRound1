@@ -1,0 +1,96 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.2, pytest-8.2.2, pluggy-1.6.0 -- C:\Users\Dinesh\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Daksh Verma\ScalerOpenENV_HackathonRound1
+configfile: pyproject.toml
+plugins: anyio-4.10.0, dash-3.0.4, langsmith-0.3.45, asyncio-0.23.7, cov-7.1.0
+asyncio: mode=Mode.STRICT
+collecting ... collected 33 items
+
+tests/test_environment.py::TestDataGenerator::test_easy_task_structure PASSED [  3%]
+tests/test_environment.py::TestDataGenerator::test_medium_task_structure PASSED [  6%]
+tests/test_environment.py::TestDataGenerator::test_hard_task_has_inconsistencies PASSED [  9%]
+tests/test_environment.py::TestDataGenerator::test_reproducible_with_seed FAILED [ 12%]
+tests/test_environment.py::TestDataGenerator::test_invalid_difficulty_raises PASSED [ 15%]
+tests/test_environment.py::TestEnvironment::test_reset_easy_returns_observation PASSED [ 18%]
+tests/test_environment.py::TestEnvironment::test_reset_initialises_state PASSED [ 21%]
+tests/test_environment.py::TestEnvironment::test_lookup_user_valid PASSED [ 24%]
+tests/test_environment.py::TestEnvironment::test_lookup_user_invalid PASSED [ 27%]
+tests/test_environment.py::TestEnvironment::test_lookup_user_redundant_penalised PASSED [ 30%]
+tests/test_environment.py::TestEnvironment::test_calculate_refund_within_window PASSED [ 33%]
+tests/test_environment.py::TestEnvironment::test_calculate_refund_partial_window PASSED [ 36%]
+tests/test_environment.py::TestEnvironment::test_full_easy_episode PASSED [ 39%]
+tests/test_environment.py::TestEnvironment::test_nop_is_penalised PASSED [ 42%]
+tests/test_environment.py::TestEnvironment::test_hard_task_requires_verify_before_refund PASSED [ 45%]
+tests/test_environment.py::TestEnvironment::test_escalate_on_hard_task_correct PASSED [ 48%]
+tests/test_environment.py::TestEnvironment::test_max_steps_terminates_episode PASSED [ 51%]
+tests/test_environment.py::TestEnvironment::test_state_tracks_step_count PASSED [ 54%]
+tests/test_environment.py::TestGrader::test_perfect_easy_episode PASSED  [ 57%]
+tests/test_environment.py::TestGrader::test_failed_episode_zero_score FAILED [ 60%]
+tests/test_environment.py::TestGrader::test_hard_task_requires_verify_for_full_score PASSED [ 63%]
+tests/test_environment.py::TestGrader::test_efficiency_penalty_for_extra_steps PASSED [ 66%]
+tests/test_environment.py::TestGrader::test_score_always_in_range PASSED [ 69%]
+tests/test_environment.py::TestGrader::test_describe_labels PASSED       [ 72%]
+tests/test_server.py::TestHealthEndpoint::test_health_returns_ok PASSED  [ 75%]
+tests/test_server.py::TestResetEndpoint::test_reset_easy PASSED          [ 78%]
+tests/test_server.py::TestResetEndpoint::test_reset_medium PASSED        [ 81%]
+tests/test_server.py::TestResetEndpoint::test_reset_hard PASSED          [ 84%]
+tests/test_server.py::TestStateEndpoint::test_state_after_reset PASSED   [ 87%]
+tests/test_server.py::TestStepEndpoint::test_lookup_user_step PASSED     [ 90%]
+tests/test_server.py::TestStepEndpoint::test_invalid_action_type_handled PASSED [ 93%]
+tests/test_server.py::TestStepEndpoint::test_full_easy_resolution_via_api PASSED [ 96%]
+tests/test_server.py::TestGradeEndpoint::test_grade_after_episode PASSED [100%]
+
+================================== FAILURES ===================================
+________________ TestDataGenerator.test_reproducible_with_seed ________________
+
+self = <tests.test_environment.TestDataGenerator object at 0x00000170657FCE90>
+
+    def test_reproducible_with_seed(self):
+        task1 = generate_task("easy", seed=123)
+        task2 = generate_task("easy", seed=123)
+        # Same seed should give same ticket ID
+>       assert task1["tickets"][0]["ticket_id"] == task2["tickets"][0]["ticket_id"]
+E       AssertionError: assert 'TKT-D4CE23' == 'TKT-34C213'
+E         
+E         - TKT-34C213
+E         ?     ^   -
+E         + TKT-D4CE23
+E         ?     ^  +
+
+tests\test_environment.py:58: AssertionError
+__________________ TestGrader.test_failed_episode_zero_score __________________
+
+self = <tests.test_environment.TestGrader object at 0x00000170657FEBA0>
+
+    def test_failed_episode_zero_score(self):
+        grader = Grader(self.easy_task)
+        score = grader.grade(
+            actions_taken=["nop", "nop"],
+            final_obs_done=False,
+            final_obs_success=False,
+            total_reward=-0.2,
+            steps_taken=2,
+            identity_verified=False,
+            refund_calculated=False,
+        )
+>       assert score < 0.3, f"Expected <0.3 for failed episode, got {score}"
+E       AssertionError: Expected <0.3 for failed episode, got 0.5
+E       assert 0.5 < 0.3
+
+tests\test_environment.py:233: AssertionError
+============================== warnings summary ===============================
+C:\Users\Dinesh\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\formparsers.py:12
+  C:\Users\Dinesh\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+tests/test_environment.py: 150 warnings
+tests/test_server.py: 30 warnings
+  D:\Daksh Verma\ScalerOpenENV_HackathonRound1\data_generator.py:79: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return (datetime.utcnow() - timedelta(days=n)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_environment.py::TestDataGenerator::test_reproducible_with_seed
+FAILED tests/test_environment.py::TestGrader::test_failed_episode_zero_score
+================= 2 failed, 31 passed, 181 warnings in 0.92s ==================

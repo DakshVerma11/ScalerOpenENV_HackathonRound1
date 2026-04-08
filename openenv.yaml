@@ -1,0 +1,42 @@
+spec_version: 1
+name: support_ticket_env
+type: space
+runtime: fastapi
+app: server.app:app
+port: 7860
+
+metadata:
+  title: "Customer Support Ticket & Database Reconciliation Environment"
+  description: >
+    An OpenEnv RL environment where an AI agent acts as a Support Operations
+    specialist. The agent reads incoming JSON support tickets, queries a mock
+    internal database, reconciles user/order data, and executes API-based
+    actions to resolve issues (refunds, subscription updates, escalations).
+  tags:
+    - support
+    - customer-service
+    - database-reconciliation
+    - real-world
+    - nlp
+  difficulty_levels:
+    - easy
+    - medium
+    - hard
+  action_space: SupportAction
+  observation_space: SupportObservation
+  reward_range: [-0.5, 0.5]
+  max_steps: 20
+
+tasks:
+  - name: easy
+    description: "Single ticket, user exists in DB. Agent must lookup user and issue refund."
+    optimal_steps: 4
+    baseline_score: 0.75
+  - name: medium
+    description: "Three tickets. One requires refund calculation. One needs subscription upgrade. One is informational."
+    optimal_steps: 8
+    baseline_score: 0.60
+  - name: hard
+    description: "Single urgent ticket with deliberate name/email/order inconsistencies. Agent must verify identity before escalating."
+    optimal_steps: 3
+    baseline_score: 0.45
