@@ -24,7 +24,6 @@ from typing import Any, Dict, Optional
 from data_generator import REFUND_POLICY_DAYS, PARTIAL_REFUND_DAYS, generate_task
 from models import ActionType, SupportAction, SupportObservation, SupportState
 
-
 class SupportEnvironment:
     """
     Customer Support Ticket & Database Reconciliation OpenEnv Environment.
@@ -168,6 +167,22 @@ class SupportEnvironment:
             )
 
         return handler(action)
+
+    async def reset_async(self, **kwargs) -> SupportObservation:
+        """Async wrapper required by openenv wrapper."""
+        return self.reset(**kwargs)
+
+    async def step_async(self, action: SupportAction) -> SupportObservation:
+        """Async wrapper required by openenv wrapper."""
+        return self.step(action)
+
+    async def state_async(self) -> SupportState:
+        """Async wrapper required by openenv wrapper."""
+        return self.state
+
+    async def close_async(self) -> None:
+        """Async wrapper required by openenv wrapper."""
+        self.close()
 
     @property
     def state(self) -> SupportState:
@@ -646,6 +661,10 @@ class SupportEnvironment:
             reward=reward,
             action_result="NOP: No action taken. Penalty applied for wasted step.",
         )
+
+    def close(self) -> None:
+        """Clean up any resources. Required by OpenEnv wrapper."""
+        pass
 
     # ------------------------------------------------------------------
     # Helpers

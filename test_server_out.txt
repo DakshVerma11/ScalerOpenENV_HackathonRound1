@@ -1,0 +1,66 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.2, pytest-8.2.2, pluggy-1.6.0
+rootdir: D:\Daksh Verma\ScalerOpenENV_HackathonRound1
+configfile: pyproject.toml
+plugins: anyio-4.10.0, dash-3.0.4, langsmith-0.3.45, asyncio-0.23.7, cov-7.1.0
+asyncio: mode=Mode.STRICT
+collected 9 items
+
+tests\test_server.py FFFFFF.FF                                           [100%]
+
+================================== FAILURES ===================================
+__________________ TestHealthEndpoint.test_health_returns_ok __________________
+tests\test_server.py:22: in test_health_returns_ok
+    assert data["status"] == "ok"
+E   AssertionError: assert 'healthy' == 'ok'
+E     
+E     - ok
+E     + healthy
+______________________ TestResetEndpoint.test_reset_easy ______________________
+tests\test_server.py:31: in test_reset_easy
+    assert len(data["tickets"]) == 1
+E   KeyError: 'tickets'
+_____________________ TestResetEndpoint.test_reset_medium _____________________
+tests\test_server.py:38: in test_reset_medium
+    assert len(data["tickets"]) == 3
+E   KeyError: 'tickets'
+______________________ TestResetEndpoint.test_reset_hard ______________________
+tests\test_server.py:44: in test_reset_hard
+    assert len(data["tickets"]) == 1
+E   KeyError: 'tickets'
+__________________ TestStateEndpoint.test_state_after_reset ___________________
+tests\test_server.py:53: in test_state_after_reset
+    assert data["difficulty"] == "easy"
+E   KeyError: 'difficulty'
+___________________ TestStepEndpoint.test_lookup_user_step ____________________
+tests\test_server.py:61: in test_lookup_user_step
+    ticket = reset_resp.json()["tickets"][0]
+E   KeyError: 'tickets'
+_____________ TestStepEndpoint.test_full_easy_resolution_via_api ______________
+tests\test_server.py:83: in test_full_easy_resolution_via_api
+    uid = reset_resp.json()["tickets"][0]["user_id"]
+E   KeyError: 'tickets'
+_________________ TestGradeEndpoint.test_grade_after_episode __________________
+tests\test_server.py:102: in test_grade_after_episode
+    uid = reset_resp.json()["tickets"][0]["user_id"]
+E   KeyError: 'tickets'
+============================== warnings summary ===============================
+C:\Users\Dinesh\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\formparsers.py:12
+  C:\Users\Dinesh\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+tests/test_server.py: 30 warnings
+  D:\Daksh Verma\ScalerOpenENV_HackathonRound1\data_generator.py:79: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return (datetime.utcnow() - timedelta(days=n)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_server.py::TestHealthEndpoint::test_health_returns_ok - Ass...
+FAILED tests/test_server.py::TestResetEndpoint::test_reset_easy - KeyError: '...
+FAILED tests/test_server.py::TestResetEndpoint::test_reset_medium - KeyError:...
+FAILED tests/test_server.py::TestResetEndpoint::test_reset_hard - KeyError: '...
+FAILED tests/test_server.py::TestStateEndpoint::test_state_after_reset - KeyE...
+FAILED tests/test_server.py::TestStepEndpoint::test_lookup_user_step - KeyErr...
+FAILED tests/test_server.py::TestStepEndpoint::test_full_easy_resolution_via_api
+FAILED tests/test_server.py::TestGradeEndpoint::test_grade_after_episode - Ke...
+================== 8 failed, 1 passed, 31 warnings in 1.96s ===================
